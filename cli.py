@@ -2,6 +2,7 @@ import sys
 import os
 
 from input_loader import load_assets
+from pdf_loader import load_assets_from_pdf
 from scanner import scan_asset
 from risk_engine import assess_risk
 
@@ -9,15 +10,14 @@ from risk_engine import assess_risk
 def prompt_input_format():
     print("Select input format:")
     print("1. CSV file")
-    print("2. PDF file (coming soon)")
+    print("2. PDF file")
 
     choice = input("Enter choice (1/2): ").strip()
 
     if choice == "1":
         return "csv"
     elif choice == "2":
-        print("[INFO] PDF input is not implemented yet.")
-        sys.exit(0)
+        return "pdf"
     else:
         print("[ERROR] Invalid choice.")
         sys.exit(1)
@@ -42,14 +42,18 @@ def main():
 
     input_type = prompt_input_format()
 
-    if input_type == "csv":
-        file_path = prompt_file_path("csv")
-
-        try:
+    try:
+        if input_type == "csv":
+            file_path = prompt_file_path("csv")
             assets = load_assets(file_path)
-        except Exception as e:
-            print(f"[ERROR] Failed to load assets: {e}")
-            sys.exit(1)
+
+        elif input_type == "pdf":
+            file_path = prompt_file_path("pdf")
+            assets = load_assets_from_pdf(file_path)
+
+    except Exception as e:
+        print(f"[ERROR] Failed to load assets: {e}")
+        sys.exit(1)
 
     if not assets:
         print("[INFO] No valid assets found. Exiting.")
