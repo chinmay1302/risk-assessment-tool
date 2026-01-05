@@ -3,10 +3,13 @@ import sys
 
 from input_loader import load_assets
 from scanner import scan_asset
+from risk_engine import assess_risk
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Context-aware security exposure and risk assessment tool"
+    )
     parser.add_argument(
         "--input",
         required=True,
@@ -37,21 +40,19 @@ def main():
 
         print(f"[+] Scanning {ip} ({asset_type}, {zone})")
 
-        result = scan_asset(ip)
+        scan_result = scan_asset(ip)
 
-        if "error" in result:
-            print(f"    [ERROR] {result['error']}")
+        if "error" in scan_result:
+            print(f"    [ERROR] {scan_result['error']}\n")
             continue
 
-        if not result["open_ports"]:
-            print("    No open ports detected\n")
-            continue
+        risk_result = assess_risk(asset, scan_result)
 
-        print("    Open ports:")
-        for port_info in result["open_ports"]:
-            port = port_info["port"]
-            service = port_info["service"]
-            print(f"      - {port}/{service}")
+        print(f"    Risk Level: {risk_result['risk_level']}")
+        print("    Findings:")
+
+        for finding in risk_result["findings"]:
+            print(f"      - {finding}")
 
         print()  # blank line between assets
 
