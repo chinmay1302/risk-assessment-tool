@@ -8,7 +8,7 @@ def scan_asset(ip: str) -> dict:
     try:
         scanner.scan(
             hosts=ip,
-            arguments="-sT -sV -T2 --open"
+            arguments="-sT -sV -T3 --open --host-timeout 30s --max-retries 1"
         )
     except Exception as e:
         return {
