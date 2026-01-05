@@ -1,37 +1,62 @@
-import argparse
 import sys
+import os
 
 from input_loader import load_assets
 from scanner import scan_asset
 from risk_engine import assess_risk
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description="Context-aware security exposure and risk assessment tool"
-    )
-    parser.add_argument(
-        "--input",
-        required=True,
-        help="Path to CSV file containing asset list"
-    )
-    return parser.parse_args()
+def prompt_input_format():
+    print("Select input format:")
+    print("1. CSV file")
+    print("2. PDF file (coming soon)")
+
+    choice = input("Enter choice (1/2): ").strip()
+
+    if choice == "1":
+        return "csv"
+    elif choice == "2":
+        print("[INFO] PDF input is not implemented yet.")
+        sys.exit(0)
+    else:
+        print("[ERROR] Invalid choice.")
+        sys.exit(1)
+
+
+def prompt_file_path(expected_ext):
+    file_path = input(f"Enter path to {expected_ext.upper()} file: ").strip()
+
+    if not os.path.exists(file_path):
+        print("[ERROR] File does not exist.")
+        sys.exit(1)
+
+    if not file_path.lower().endswith(f".{expected_ext}"):
+        print(f"[ERROR] Expected a .{expected_ext} file.")
+        sys.exit(1)
+
+    return file_path
 
 
 def main():
-    args = parse_arguments()
+    print("\n=== Context-Aware Security Risk Assessment Tool ===\n")
 
-    try:
-        assets = load_assets(args.input)
-    except Exception as e:
-        print(f"[ERROR] Failed to load assets: {e}")
-        sys.exit(1)
+    input_type = prompt_input_format()
+
+    if input_type == "csv":
+        file_path = prompt_file_path("csv")
+
+        try:
+            assets = load_assets(file_path)
+        except Exception as e:
+            print(f"[ERROR] Failed to load assets: {e}")
+            sys.exit(1)
 
     if not assets:
         print("[INFO] No valid assets found. Exiting.")
         sys.exit(0)
 
-    print(f"[INFO] Loaded {len(assets)} assets\n")
+    print(f"\n[INFO] Loaded {len(assets)} assets")
+    print("[INFO] Starting assessment...\n")
 
     for asset in assets:
         ip = asset["ip"]
@@ -54,7 +79,7 @@ def main():
         for finding in risk_result["findings"]:
             print(f"      - {finding}")
 
-        print()  # blank line between assets
+        print()
 
 
 if __name__ == "__main__":
