@@ -22,7 +22,10 @@ def scan_asset(ip: str) -> dict:
     }
 
     if ip not in scanner.all_hosts():
-        return results
+        return {
+            "ip": ip,
+            "error": "Host appears to be down or unreachable (no response from nmap)"
+        }
 
     for protocol in scanner[ip].all_protocols():
         ports = scanner[ip][protocol].keys()
