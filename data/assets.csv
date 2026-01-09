@@ -1,0 +1,4 @@
+ip,asset_type,zone
+10.10.1.20,server,internal
+10.10.1.21,nas,internal
+10.10.1.30,hmi,dmz

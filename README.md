@@ -44,3 +44,42 @@ No interaction with PLCs or field devices
 No aggressive scanning
 
 The goal is visibility and prioritization, not testing system resilience.
+
+Supported inputs-
+
+    csv
+    pdf
+
+
+How to run
+Setup
+
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+
+Ensure Nmap is installed:
+
+nmap --version
+
+Run the tool
+python cli.py
+
+
+The CLI will guide you through selecting the input type and file.
+
+Example Output
+[INFO] Loaded 3 assets
+[INFO] Starting assessment...
+
+[+] Scanning 10.10.1.30 (hmi, dmz)
+    Risk Level: HIGH
+    Findings:
+      - Management service SSH exposed in DMZ
+
+Author
+
+Chinmay Maheshwari
+Cybersecurity | Controls & Digitalization | Python Automation
+
