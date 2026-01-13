@@ -1,9 +1,6 @@
 @echo off
 setlocal ENABLEDELAYEDEXPANSION
 
-REM ============================================================
-REM 1) Check that Python is installed
-REM ============================================================
 where python >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Python is not installed or not on PATH.
@@ -12,9 +9,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM ============================================================
-REM 2) Check that nmap is installed
-REM ============================================================
 where nmap >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Nmap is not installed or not on PATH.
@@ -23,9 +17,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM ============================================================
-REM 3) Ensure virtual environment (.venv) exists
-REM ============================================================
 if not exist .venv (
     echo [.venv] Virtual environment not found. Creating one...
     python -m venv .venv
@@ -36,9 +27,6 @@ if not exist .venv (
     )
 )
 
-REM ============================================================
-REM 4) Activate virtual environment
-REM ============================================================
 if exist .venv\Scripts\activate.bat (
     call .venv\Scripts\activate
 ) else (
@@ -48,9 +36,6 @@ if exist .venv\Scripts\activate.bat (
     exit /b 1
 )
 
-REM ============================================================
-REM 5) Install Python dependencies if not already done
-REM ============================================================
 if not exist .venv\deps_installed.txt (
     echo Installing Python dependencies from requirements.txt ...
     pip install -r requirements.txt
@@ -62,9 +47,6 @@ if not exist .venv\deps_installed.txt (
     echo done > .venv\deps_installed.txt
 )
 
-REM ============================================================
-REM 6) Run the CLI
-REM ============================================================
 python cli.py
 if errorlevel 1 (
     echo [ERROR] CLI exited with an error.
