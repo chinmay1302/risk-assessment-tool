@@ -1,10 +1,12 @@
 import sys
 import os
+from datetime import datetime
 
 from input_loader import load_assets
 from pdf_loader import load_assets_from_pdf
 from scanner import scan_asset
 from risk_engine import assess_risk
+from output import generate_pdf_report
 
 
 def prompt_input_format():
@@ -37,6 +39,13 @@ def prompt_file_path(expected_ext):
     return file_path
 
 
+def prompt_generate_report():
+    """Ask user if they want to generate a PDF report."""
+    print("\n" + "="*60)
+    response = input("Would you like to generate a PDF report? (y/n): ").strip().lower()
+    return response in ['y', 'yes']
+
+
 def main():
     print("\n=== Context-Aware Security Risk Assessment Tool ===\n")
 
@@ -62,6 +71,8 @@ def main():
     print(f"\n[INFO] Loaded {len(assets)} assets")
     print("[INFO] Starting assessment...\n")
 
+    all_results = []
+
     for asset in assets:
         ip = asset["ip"]
         asset_type = asset["asset_type"]
@@ -73,6 +84,12 @@ def main():
 
         if "error" in scan_result:
             print(f"    [ERROR] {scan_result['error']}\n")
+           
+            all_results.append({
+                "asset": asset,
+                "scan_result": scan_result,
+                "risk_result": None
+            })
             continue
 
         risk_result = assess_risk(asset, scan_result)
@@ -84,6 +101,20 @@ def main():
             print(f"      - {finding}")
 
         print()
+
+        # Store successful result
+        all_results.append({
+            "asset": asset,
+            "scan_result": scan_result,
+            "risk_result": risk_result
+        })
+
+    if prompt_generate_report():
+        try:
+            output_path = generate_pdf_report(all_results)
+            print(f"\n[SUCCESS] PDF report generated: {output_path}")
+        except Exception as e:
+            print(f"\n[ERROR] Failed to generate PDF report: {e}")
 
 
 if __name__ == "__main__":
